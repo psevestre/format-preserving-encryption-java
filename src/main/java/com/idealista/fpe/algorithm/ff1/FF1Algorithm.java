@@ -18,7 +18,11 @@ class FF1Algorithm {
 
     private FF1Algorithm (){}
 
-    static int[] encrypt(int[] plainText, Integer radix, byte[] tweak, PseudoRandomFunction pseudoRandomFunction) {
+    static int[] encrypt(int[] plainText, Integer radix, byte[] tweak, PseudoRandomFunction pseudoRandomFunction ) {
+    	return encrypt(plainText, radix, tweak, pseudoRandomFunction, NUMBER_OF_ROUNDS);
+    }
+    
+    static int[] encrypt(int[] plainText, Integer radix, byte[] tweak, PseudoRandomFunction pseudoRandomFunction,int rounds) {
         IntString target = new IntString(plainText);
         int leftSideLength = target.leftSideLength();
         int rightSideLength = target.rightSideLength();
@@ -28,7 +32,7 @@ class FF1Algorithm {
 
         int[] left = target.left();
         int[] right = target.right();
-        for (int round=0; round<NUMBER_OF_ROUNDS; round++) {
+        for (int round=0; round< rounds; round++) {
             BigInteger roundNumeral = roundNumeral(num(right, radix), tweak, padding, pseudoRandomFunction, lengthOfLeftAfterEncoded, paddingToEnsureFeistelOutputIsBigger, round);
             int partialLength = round % 2 == 0 ? leftSideLength : rightSideLength;
             BigInteger partialNumeral = num(left, radix).add(roundNumeral).mod(BigInteger.valueOf(radix).pow(partialLength));
@@ -40,6 +44,10 @@ class FF1Algorithm {
     }
 
     static int[] decrypt(int[] cipherText, Integer radix, byte[] tweak, PseudoRandomFunction pseudoRandomFunction) {
+    	return decrypt(cipherText, radix, tweak, pseudoRandomFunction, NUMBER_OF_ROUNDS);
+    }
+    
+    static int[] decrypt(int[] cipherText, Integer radix, byte[] tweak, PseudoRandomFunction pseudoRandomFunction, int rounds) {
         IntString target = new IntString(cipherText);
         int leftSideLength = target.leftSideLength();
         int rightSideLength = target.rightSideLength();
@@ -49,7 +57,7 @@ class FF1Algorithm {
 
         int[] left = target.left();
         int[] right = target.right();
-        for (int round=NUMBER_OF_ROUNDS-1; round>=0; round--) {
+        for (int round=rounds-1; round>=0; round--) {
             BigInteger roundNumeral = roundNumeral(num(left, radix), tweak, padding, pseudoRandomFunction, lengthOfLeftAfterEncoded, paddingToEnsureFeistelOutputIsBigger, round);
             int partialLength = round % 2 == 0 ? leftSideLength : rightSideLength;
             BigInteger partialNumeral = num(right, radix).subtract(roundNumeral).mod(BigInteger.valueOf(radix).pow(partialLength));

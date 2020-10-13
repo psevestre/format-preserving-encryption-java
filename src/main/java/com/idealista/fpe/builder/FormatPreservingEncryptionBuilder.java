@@ -21,10 +21,24 @@ public class FormatPreservingEncryptionBuilder {
     private FormatPreservingEncryptionBuilder () {
         throw  new IllegalArgumentException(AVOID_INSTANCE_MESSAGE);
     }
+
+    /**
+     * FF1 implementation with default number of rounds (10)
+     * @return
+     */
     public static WithDomain ff1Implementation() {
         return new WithDomainStep(ff1);
     }
 
+    /**
+     * FF1 implementation with a given number of rounds
+     * @param rounds Number of FEISTEL rounds
+     * @return
+     */
+    public static WithDomain ff1Implementation(int rounds) {
+        return new WithDomainStep( new com.idealista.fpe.algorithm.ff1.Cipher(rounds));
+    }
+    
     private static class WithDomainStep implements WithDomain {
 
         private Cipher cipher;
